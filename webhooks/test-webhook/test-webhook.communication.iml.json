@@ -1,0 +1,22 @@
+{
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "success": true,
+      "message": "Webhook received successfully",
+      "timestamp": "{{now}}",
+      "data": {
+        "id": "mock-001",
+        "type": "test",
+        "status": "active"
+      },
+      "metadata": {
+        "version": "{{common.version}}",
+        "environment": "{{common.environment}}"
+      }
+    }
+  }
+}

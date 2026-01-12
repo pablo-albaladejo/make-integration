@@ -1,89 +1,122 @@
 # Make Integration Project
 
-A project to develop and manage Make (formerly Integromat) integrations for business automation.
+A local development project for Make.com custom apps using VS Code and Make Apps SDK.
 
 ## What is this project?
 
-This project helps you build integrations using Make.com. You can create modules, connections, and automation flows that connect different services and APIs.
+This project uses the official **Make Apps Editor for VS Code** to develop custom integrations locally. You can:
+
+- Clone apps from Make.com to your local machine
+- Develop offline with full Git version control
+- Deploy changes back to Make.com
+- Collaborate with your team using GitHub
+
+## Prerequisites
+
+- **Make.com account** (not Free tier - API access required)
+- **VS Code** with [Make Apps Editor extension](https://marketplace.visualstudio.com/items?itemName=Integromat.apps-sdk)
+- **Git** for version control
+- **Make API Key** (generate in Make.com settings)
 
 ## Project Structure
 
 ```
 make-integration/
-├── src/
-│   ├── modules/          # Action and trigger modules
-│   ├── connections/      # API connection configurations
-│   ├── webhooks/         # Webhook handlers
-│   └── common/           # Shared functions and utilities
-├── docs/                 # Documentation files
-├── tests/                # Test files
-└── examples/             # Example integrations
+├── base/                    # Base configuration (inherited by all modules)
+│   └── base.iml.json
+├── modules/                 # Action, search, and trigger modules
+│   └── test-webhook/
+│       ├── test-webhook.communication.iml.json
+│       └── test-webhook.parameters.iml.json
+├── connections/             # API connection configurations
+├── webhooks/                # Webhook definitions
+├── rpcs/                    # Remote Procedure Calls
+├── functions/               # Custom IML functions
+├── common/                  # Shared common data
+│   └── common.iml.json
+├── .vscode/                 # VS Code configuration
+│   └── settings.json
+├── CLAUDE.md               # Instructions for Claude Code
+├── AGENTS.md               # Custom agent definitions
+└── PROBLEM_STATEMENT.md    # Business problem description
 ```
 
-## What can you do with Make integrations?
+## File Naming Convention
 
-- Connect different services (Salesforce, Intercom, custom APIs)
-- Automate business processes
-- Handle data transformation
-- Manage customer workflows
-- Process invoices and documents
+Make Apps SDK uses this naming pattern:
 
-## Technologies Used
+```
+component-name.block-type.iml.json
+```
 
-- **JSON** - For defining integration structure
-- **JavaScript** - For custom logic and data transformation
-- **Make.com** - Integration platform
-- **REST APIs** - For connecting to external services
+Examples:
+- `create-invoice.communication.iml.json` - API call definition
+- `create-invoice.parameters.iml.json` - Input parameters
+- `create-invoice.interface.iml.json` - Output interface
+- `create-invoice.samples.iml.json` - Sample data
 
 ## Getting Started
 
-### Prerequisites
+### 1. Install VS Code Extension
 
-- A Make.com account
-- Basic knowledge of JSON and JavaScript
-- Understanding of REST APIs
+Search for "Make Apps Editor" in VS Code extensions or install from:
+https://marketplace.visualstudio.com/items?itemName=Integromat.apps-sdk
 
-### Installation
+### 2. Generate API Key
 
-1. Clone this repository:
-```bash
-git clone <repository-url>
-cd make-integration
-```
+1. Log in to Make.com
+2. Go to Profile > API
+3. Generate a new API key
+4. Copy and save it securely
 
-2. Install dependencies (if any):
-```bash
-npm install
-```
+### 3. Configure VS Code
 
-3. Read the problem statement:
-```bash
-cat PROBLEM_STATEMENT.md
-```
+1. Open VS Code
+2. Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows)
+3. Search "Make: Configure"
+4. Enter your API key and environment URL
+
+### 4. Clone or Create App
+
+- **Clone existing**: Right-click on app in Make sidebar > Clone
+- **Create new**: Right-click on "My apps" > New App
+
+### 5. Develop Locally
+
+Edit `.iml.json` files in VS Code with:
+- Syntax highlighting
+- Auto-completion
+- Error checking
+- Git integration
+
+### 6. Deploy to Make
+
+Right-click on app > Deploy to sync changes with Make.com
 
 ## Main Use Cases
 
-This project focuses on solving common automation challenges:
+This project solves automation challenges from the problem statement:
 
-1. **Customer Support Automation** - Reduce response times
-2. **Invoice Processing** - Handle Veri*factu compliance
-3. **Data Synchronization** - Keep systems in sync
-4. **Workflow Automation** - Remove manual tasks
+1. **Customer Support** - Intelligent ticket sorting with AI
+2. **Invoice Processing** - Veri*factu compliance (sequential processing)
+3. **Data Sync** - Salesforce, Intercom, internal systems
+4. **Automation Governance** - Clean, documented, maintainable workflows
+
+## Technology Stack
+
+- **Make.com** - Integration platform
+- **IML (Integromat Markup Language)** - JSON-based configuration
+- **JavaScript** - Limited custom logic within modules
+- **VS Code** - Local development environment
+- **Git** - Version control
 
 ## Documentation
 
-- [Problem Statement](./PROBLEM_STATEMENT.md) - Detailed problem description
-- [API Documentation](./docs/API.md) - API reference (coming soon)
-- [Examples](./examples/) - Working examples
-
-## Contributing
-
-Contributions are welcome! Please read the contribution guidelines before submitting changes.
+- [PROBLEM_STATEMENT.md](./PROBLEM_STATEMENT.md) - Business problems we solve
+- [CLAUDE.md](./CLAUDE.md) - Instructions for AI assistance
+- [AGENTS.md](./AGENTS.md) - Specialized agent definitions
+- [Make Developer Hub](https://developers.make.com/custom-apps-documentation)
 
 ## License
 
-This project is licensed under the MIT License.
-
-## Contact
-
-For questions or support, please open an issue in this repository.
+MIT

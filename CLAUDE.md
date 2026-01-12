@@ -1,150 +1,168 @@
 # Claude Instructions for Make Integration Project
 
-This file contains specific instructions for Claude Code when working on this Make.com integration project.
+Instructions for Claude Code when working on this Make.com custom apps project.
 
 ## Project Context
 
-This is a Make.com (formerly Integromat) integration project focused on solving automation challenges for growing businesses. The main challenges include:
+This project uses **Make Apps SDK with VS Code** for local development of Make.com custom apps. The main challenges are:
 
-1. **Customer Support Automation** - Reduce response times through intelligent ticket sorting
-2. **Invoice Processing** - Implement Veri*factu compliance with sequential processing
-3. **Data Synchronization** - Keep Salesforce, Intercom, and internal systems in sync
-4. **Automation Governance** - Clean up and standardize existing automations
+1. Customer Support Automation
+2. Invoice Processing (Veri*factu compliance)
+3. Data Synchronization
+4. Automation Governance
 
-## Technology Constraints
+## Development Environment
 
-### What You CAN Use
-- **JSON** - Primary language for module definitions
-- **JavaScript** - For custom logic within modules (limited scope)
-- **REST APIs** - For external integrations
-- **Make.com platform** - No-code/low-code automation
-- **Webhooks** - For real-time event handling
+### Tools
+- **VS Code** with Make Apps Editor extension
+- **Make Apps SDK** for local development
+- **Git** for version control
+- **Make.com API** for deployment
 
-### What You CANNOT Use
-- Python, Ruby, PHP, or other backend languages (Make doesn't support them)
-- Custom servers or hosting (unless as external endpoints)
-- Direct database access (must go through APIs)
-- Complex npm packages (limited JavaScript runtime)
+### Workflow
+```
+Local (VS Code) → Git Commit → Deploy to Make.com
+```
 
-## File Structure Conventions
+## File Structure
 
-### Module Files (`src/modules/`)
-- Use kebab-case: `create-invoice.json`, `send-notification.json`
-- Each module must have: `name`, `label`, `description`, `type`, `connection`, `parameters`, `execute`
-- Group related modules with prefixes: `invoice-create.json`, `invoice-update.json`, `invoice-delete.json`
+```
+make-integration/
+├── base/                    # Base configuration
+├── modules/                 # Action and trigger modules
+├── connections/             # API connections
+├── webhooks/                # Webhook definitions
+├── rpcs/                    # Remote Procedure Calls
+├── functions/               # Custom IML functions
+└── common/                  # Shared data
+```
 
-### Connection Files (`src/connections/`)
-- One file per service: `salesforce-connection.json`, `intercom-connection.json`
-- Must include authentication configuration
-- Never commit API keys or secrets (use environment variables)
+## File Naming Convention
 
-### Common Functions (`src/common/`)
-- Reusable JavaScript functions
-- Data transformation utilities
-- Validation helpers
+All Make component files follow this pattern:
 
-## Code Style Guidelines
+```
+component-name.block-type.iml.json
+```
 
-### JSON Modules
+### Block Types
+- `communication` - API calls (URL, method, headers, body)
+- `parameters` - Input fields users fill in
+- `interface` - Output structure
+- `samples` - Example data for testing
+- `scope` - OAuth scopes (for connections)
+- `mappable` - Mappable parameters
+- `static` - Static parameters
+
+### Examples
+```
+create-invoice.communication.iml.json
+create-invoice.parameters.iml.json
+create-invoice.interface.iml.json
+```
+
+## IML JSON Structure
+
+### Module Communication Block
 ```json
 {
-  "name": "camelCaseModuleName",
-  "label": "Human Readable Label",
-  "description": "Clear description of what this module does",
-  "type": "action",
-  "connection": "service-name",
-  "parameters": [
-    {
-      "name": "paramName",
-      "type": "text|email|number|boolean|date|select",
-      "label": "User-Friendly Label",
-      "required": true|false,
-      "help": "Optional help text",
-      "default": "optional default value"
-    }
-  ],
-  "execute": {
-    "url": "/api/endpoint",
-    "method": "GET|POST|PUT|DELETE|PATCH",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "field": "{{parameters.paramName}}"
-    },
-    "response": {
-      "output": {
-        "id": "{{body.id}}",
-        "status": "{{body.status}}"
-      },
-      "error": {
-        "message": "{{body.error.message}}"
-      }
-    }
+  "url": "/api/endpoint",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "field": "{{parameters.fieldName}}"
+  },
+  "response": {
+    "output": "{{body}}"
   }
 }
 ```
 
-### JavaScript in Modules
-- Keep it simple and functional
-- Avoid complex dependencies
-- Use arrow functions when possible
-- Always return a value
+### Module Parameters Block
+```json
+[
+  {
+    "name": "fieldName",
+    "type": "text",
+    "label": "Field Label",
+    "required": true,
+    "help": "Help text for users"
+  }
+]
+```
 
-```javascript
-// Good
-return items.map(item => ({ id: item.id, name: item.name.toUpperCase() }))
-
-// Bad (too complex for Make runtime)
-const processItems = async () => {
-  const results = await Promise.all(items.map(async item => {
-    // Complex async logic
-  }))
-  return results
+### Base Configuration
+```json
+{
+  "baseUrl": "https://api.example.com",
+  "headers": {
+    "Authorization": "Bearer {{connection.apiKey}}"
+  }
 }
 ```
 
+### Common Data
+```json
+{
+  "timeout": 300000,
+  "version": "1.0.0"
+}
+```
+
+## IML Expressions
+
+Use double curly braces for dynamic values:
+
+```
+{{parameters.name}}       - Input parameter
+{{connection.apiKey}}     - Connection value
+{{body.result}}           - Response body
+{{headers.contentType}}   - Response header
+{{now}}                   - Current timestamp
+{{common.timeout}}        - Common data value
+```
+
+## Parameter Types
+
+Available types for parameters:
+- `text` - String input
+- `number` - Numeric input
+- `boolean` - True/false checkbox
+- `date` - Date picker
+- `select` - Dropdown list
+- `email` - Email with validation
+- `url` - URL with validation
+- `array` - List of items
+- `collection` - Object with nested fields
+- `buffer` - Binary data
+- `filename` - File name
+- `file` - File upload
+
 ## Critical Requirements
 
-### Security (ISO 27001 Compliance)
-When working with sensitive data:
-- ✅ Use HTTPS endpoints only
-- ✅ Encrypt sensitive parameters
-- ✅ Implement proper authentication
-- ✅ Log all data access (audit trail)
-- ✅ Never expose PII in logs
-- ❌ Don't use public Google Sheets for data transfer
-- ❌ Don't hard-code credentials
-- ❌ Don't store sensitive data in variables without encryption
+### Security (ISO 27001)
+- ✅ Use HTTPS only
+- ✅ Store secrets in connections, not common data
+- ✅ Never log sensitive data
+- ❌ Don't hard-code API keys
+- ❌ Don't expose PII in errors
 
 ### Veri*factu Compliance
-When working with invoice modules:
-- ✅ Ensure sequential processing (use queues)
-- ✅ Generate SHA-256 hash chains
-- ✅ Create QR codes for each invoice
-- ✅ Log all events immutably
-- ✅ Prevent race conditions
-- ❌ Don't process invoices in parallel
-- ❌ Don't skip hash validation
-- ❌ Don't allow manual invoice ordering
+- ✅ Sequential processing (use queues)
+- ✅ SHA-256 hash chains
+- ✅ QR code generation
+- ✅ Immutable audit logs
+- ❌ Never process invoices in parallel
 
 ### Error Handling
-All modules must handle errors gracefully:
-- Provide clear error messages
-- Include error codes when available
-- Suggest remediation steps
-- Log errors for monitoring
-- Implement retry logic for transient failures
-
-Example:
 ```json
 {
   "response": {
     "error": {
       "type": "{{statusCode}}",
-      "message": "Failed to create invoice: {{body.error.message}}",
-      "detail": "{{body.error.detail}}",
-      "remediation": "Check that all required fields are provided and the customer exists"
+      "message": "{{body.error.message}}"
     }
   }
 }
@@ -152,149 +170,80 @@ Example:
 
 ## Common Tasks
 
-### Task: Create a New Module
-1. Copy `examples/simple-module.json` to `src/modules/your-module.json`
-2. Update `name`, `label`, `description`
-3. Define `parameters` based on what inputs are needed
-4. Configure the `execute` block with API details
-5. Map the `response` output
-6. Test with Make.com platform
-7. Document in module comments
+### Create New Module
 
-### Task: Add API Connection
-1. Create `src/connections/service-name.json`
-2. Define authentication method (OAuth, API Key, Basic)
-3. Set base URL and common headers
-4. Test authentication flow
-5. Document required credentials
+1. Create folder: `modules/my-module/`
+2. Add communication: `my-module.communication.iml.json`
+3. Add parameters: `my-module.parameters.iml.json`
+4. Add interface: `my-module.interface.iml.json`
+5. Test in Make.com
 
-### Task: Implement Sequential Processing
-For Veri*factu compliance or any sequential workflow:
-1. Create a queue system (external or using Make's built-in queue)
-2. Ensure single-threaded processing
-3. Implement hash chain calculation
-4. Add error recovery (what happens if one item fails?)
-5. Log all processing steps
+### Create New Connection
 
-### Task: Debug an Integration
-1. Check Make.com execution logs
-2. Verify API credentials are valid
-3. Test API endpoints directly (Postman, curl)
-4. Check parameter mapping ({{parameters.x}})
-5. Verify response structure matches expectations
-6. Add console logging if available
+1. Create folder: `connections/my-service/`
+2. Add base: `my-service.base.iml.json`
+3. Add parameters: `my-service.parameters.iml.json`
+4. For OAuth: add `my-service.scope.iml.json`
 
-## When Asking Claude for Help
+### Create New Webhook
 
-### DO Provide:
-- The specific module or file you're working on
-- The error message or unexpected behavior
-- What you've already tried
-- The Make.com execution log (if available)
-- The API documentation you're integrating with
+1. Create folder: `webhooks/my-webhook/`
+2. Add communication: `my-webhook.communication.iml.json`
+3. Add parameters: `my-webhook.parameters.iml.json`
 
-### Example Good Question:
-"I'm working on `src/modules/create-invoice.json` and getting a 401 error. The API docs say to use Bearer token authentication. I've set up the connection with `Authorization: Bearer {{connection.token}}` but it's still failing. Here's the error log: [paste log]. What am I missing?"
+## Testing
 
-### Example Bad Question:
-"My module doesn't work. Fix it."
-
-## Testing Strategy
-
-1. **Unit Test**: Test each module independently in Make.com
-2. **Integration Test**: Test the full workflow end-to-end
-3. **Error Test**: Deliberately cause errors and verify handling
-4. **Load Test**: For critical paths, verify performance with volume
-5. **Compliance Test**: For Veri*factu, verify hash chains and QR codes
-
-## Documentation Requirements
-
-Every module must include:
-- Clear `description` field
-- Help text for non-obvious parameters
-- Comments explaining complex logic
-- Example usage in comments or separate file
-
-## Performance Considerations
-
-- Minimize API calls (batch when possible)
-- Use pagination for large datasets
-- Implement caching where appropriate
-- Consider rate limits (add delays if needed)
-- Monitor execution time (Make has timeout limits)
+1. Deploy to Make.com test environment
+2. Create a scenario with your module
+3. Run with test data
+4. Check execution logs
+5. Fix issues locally
+6. Redeploy
 
 ## Git Workflow
 
-### Commit Messages
-Use conventional commits:
-- `feat: add invoice creation module`
-- `fix: correct hash calculation in Veri*factu`
-- `docs: update API connection instructions`
-- `refactor: simplify ticket classification logic`
-- `test: add validation for QR code generation`
+### Commits
+```bash
+feat: add invoice processor module
+fix: correct hash calculation
+docs: update parameter descriptions
+```
 
-### Branch Naming
-- `feature/invoice-processing`
-- `fix/intercom-tag-deletion`
-- `docs/api-reference`
+### Branches
+```
+feature/invoice-processing
+fix/intercom-tags
+docs/api-reference
+```
 
-## Useful References
+## Useful IML Patterns
 
-- [Make.com Modules Documentation](https://www.make.com/en/help/modules)
-- [Make.com API Reference](https://www.make.com/en/api-documentation)
-- Project files:
-  - `PROBLEM_STATEMENT.md` - Understand the business problems
-  - `docs/GETTING_STARTED.md` - Quick start guide
-  - `examples/` - Working examples
-  - `src/README.md` - Source code structure
+### Conditional Value
+```json
+"value": "{{if(parameters.flag, 'yes', 'no')}}"
+```
 
-## Common Pitfalls to Avoid
+### Array Mapping
+```json
+"items": "{{map(body.items, 'item.id')}}"
+```
 
-1. **Forgetting Make.com Limitations**: Remember you're in a limited JavaScript runtime, not Node.js
-2. **Ignoring Rate Limits**: APIs have limits; implement backoff strategies
-3. **Hardcoding Values**: Use parameters and connection variables
-4. **Poor Error Messages**: Users need actionable error information
-5. **No Validation**: Validate inputs before making API calls
-6. **Overcomplicating**: Start simple, add complexity only when needed
+### Date Formatting
+```json
+"date": "{{formatDate(now, 'YYYY-MM-DD')}}"
+```
 
-## When to Use Custom Code vs. Make Modules
+### Default Value
+```json
+"name": "{{ifempty(parameters.name, 'default')}}"
+```
 
-### Use Make Modules When:
-- The logic is straightforward (CRUD operations)
-- Built-in error handling is sufficient
-- Performance is not critical
-- Rapid prototyping is needed
+## References
 
-### Use Custom Code (external endpoints) When:
-- Complex business logic is required
-- Need access to specific libraries
-- Performance is critical
-- Advanced error handling is needed
-- Veri*factu hash chain calculations (precision matters)
-
-## Project-Specific Notes
-
-### Veri*factu Implementation
-- Hash function: SHA-256
-- Chain formula: `Hash(N) = SHA-256(Data_N + Hash(N-1))`
-- QR Code: Must include URL to AEAT verification
-- Sequential processing: CRITICAL - no parallel invoice creation
-
-### Intercom Integration
-- Tag deletion requires ID, not name (need mapping step)
-- Use cache for tag name-to-ID mapping
-- Refresh cache daily
-
-### Trustpilot Integration
-- OAuth 2.0 with token refresh
-- Build custom middleware for authentication
-- Invite links must be generated immediately after positive interaction
-
-### Salesforce Sync
-- Use Salesforce REST API v52+
-- Implement field mapping for custom fields
-- Handle API version updates
+- [Make Developer Hub](https://developers.make.com/custom-apps-documentation)
+- [Make Apps Editor Extension](https://marketplace.visualstudio.com/items?itemName=Integromat.apps-sdk)
+- [IML Reference](https://developers.make.com/custom-apps-documentation/iml)
 
 ---
 
-**Remember**: This project prioritizes reliability and compliance over speed. A slow, correct automation is better than a fast, broken one.
+**Remember**: All code is IML JSON. JavaScript is only for limited transformations within modules.

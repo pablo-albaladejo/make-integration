@@ -1,0 +1,9 @@
+[
+  {
+    "name": "payload",
+    "type": "collection",
+    "label": "Request Payload",
+    "required": false,
+    "help": "The incoming request body (parsed automatically)"
+  }
+]

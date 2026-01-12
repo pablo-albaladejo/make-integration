@@ -1,0 +1,16 @@
+{
+  "baseUrl": "{{common.baseUrl}}",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  "response": {
+    "error": {
+      "type": "{{statusCode}}",
+      "message": "{{body.error.message}}"
+    }
+  },
+  "log": {
+    "sanitize": ["authorization", "apiKey", "password", "token"]
+  }
+}

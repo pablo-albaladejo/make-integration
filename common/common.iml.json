@@ -1,0 +1,6 @@
+{
+  "baseUrl": "https://api.example.com",
+  "timeout": 300000,
+  "version": "1.0.0",
+  "environment": "development"
+}

@@ -1,0 +1,39 @@
+[
+  {
+    "name": "success",
+    "type": "boolean",
+    "label": "Success"
+  },
+  {
+    "name": "message",
+    "type": "text",
+    "label": "Message"
+  },
+  {
+    "name": "timestamp",
+    "type": "date",
+    "label": "Timestamp"
+  },
+  {
+    "name": "data",
+    "type": "collection",
+    "label": "Data",
+    "spec": [
+      {
+        "name": "id",
+        "type": "text",
+        "label": "ID"
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "label": "Type"
+      },
+      {
+        "name": "status",
+        "type": "text",
+        "label": "Status"
+      }
+    ]
+  }
+]
