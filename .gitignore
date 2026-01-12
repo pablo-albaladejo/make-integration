@@ -46,5 +46,5 @@ temp/
 *.imt
 .imt/
 
-# Claude
-./claude/settings.local.json
+# Claude Code
+.claude/settings.local.json
